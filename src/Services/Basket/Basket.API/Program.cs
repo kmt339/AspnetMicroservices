@@ -1,5 +1,5 @@
-using Catalog.API.Data;
-using Catalog.API.Repositories;
+using Basket.API.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +10,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ICatalogContext, CatalogContext>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+ConfigurationManager configuration = builder.Configuration;
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = configuration.GetValue<string>("CacheSettings:ConnectionString");
+});
+
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
 var app = builder.Build();
 
